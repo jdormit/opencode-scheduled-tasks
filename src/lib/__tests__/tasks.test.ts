@@ -1,0 +1,238 @@
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { parseTaskFile, readAllTasks, expandPath, setTaskEnabled } from "../tasks.js";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+
+let tmpDir: string;
+
+beforeEach(() => {
+  tmpDir = mkdtempSync(join(tmpdir(), "opencode-tasks-test-"));
+});
+
+afterEach(() => {
+  rmSync(tmpDir, { recursive: true, force: true });
+});
+
+describe("expandPath", () => {
+  it("expands ~ to home directory", () => {
+    const home = process.env.HOME ?? process.env.USERPROFILE ?? "";
+    expect(expandPath("~/projects")).toBe(join(home, "projects"));
+    expect(expandPath("~")).toBe(home);
+  });
+
+  it("leaves absolute paths unchanged", () => {
+    expect(expandPath("/usr/local/bin")).toBe("/usr/local/bin");
+  });
+
+  it("leaves relative paths unchanged", () => {
+    expect(expandPath("./foo/bar")).toBe("./foo/bar");
+  });
+});
+
+describe("parseTaskFile", () => {
+  it("parses a valid task file", () => {
+    const filePath = join(tmpDir, "test-task.md");
+    writeFileSync(
+      filePath,
+      `---
+name: test-task
+description: A test task
+schedule: "0 9 * * *"
+cwd: ~/projects
+---
+
+Do the thing.
+`
+    );
+
+    const task = parseTaskFile(filePath);
+    expect(task.name).toBe("test-task");
+    expect(task.description).toBe("A test task");
+    expect(task.schedule).toBe("0 9 * * *");
+    expect(task.cwd).toBe("~/projects");
+    expect(task.sessionMode).toBe("new");
+    expect(task.enabled).toBe(true);
+    expect(task.prompt).toBe("Do the thing.");
+    expect(task.filePath).toBe(filePath);
+  });
+
+  it("parses all optional fields", () => {
+    const filePath = join(tmpDir, "full-task.md");
+    writeFileSync(
+      filePath,
+      `---
+name: full-task
+description: A full task
+schedule: "0 9 * * 1-5"
+cwd: ~/projects/app
+session_mode: named
+session_name: my-session
+model: anthropic/claude-sonnet-4-6
+agent: build
+permission:
+  bash:
+    "*": "allow"
+  edit: "deny"
+enabled: false
+---
+
+Full prompt here.
+`
+    );
+
+    const task = parseTaskFile(filePath);
+    expect(task.sessionMode).toBe("named");
+    expect(task.sessionName).toBe("my-session");
+    expect(task.model).toBe("anthropic/claude-sonnet-4-6");
+    expect(task.agent).toBe("build");
+    expect(task.permission).toEqual({
+      bash: { "*": "allow" },
+      edit: "deny",
+    });
+    expect(task.enabled).toBe(false);
+  });
+
+  it("throws on missing required fields", () => {
+    const filePath = join(tmpDir, "bad-task.md");
+    writeFileSync(
+      filePath,
+      `---
+name: bad-task
+---
+
+Missing fields.
+`
+    );
+
+    expect(() => parseTaskFile(filePath)).toThrow("Invalid task file");
+  });
+
+  it("throws when name doesn't match filename", () => {
+    const filePath = join(tmpDir, "mismatch.md");
+    writeFileSync(
+      filePath,
+      `---
+name: wrong-name
+description: test
+schedule: "0 9 * * *"
+cwd: /tmp
+---
+
+Prompt.
+`
+    );
+
+    expect(() => parseTaskFile(filePath)).toThrow("does not match filename");
+  });
+
+  it("throws when session_mode is named but session_name is missing", () => {
+    const filePath = join(tmpDir, "no-session.md");
+    writeFileSync(
+      filePath,
+      `---
+name: no-session
+description: test
+schedule: "0 9 * * *"
+cwd: /tmp
+session_mode: named
+---
+
+Prompt.
+`
+    );
+
+    expect(() => parseTaskFile(filePath)).toThrow("session_name");
+  });
+});
+
+describe("readAllTasks", () => {
+  it("reads all .md files from a directory", () => {
+    writeFileSync(
+      join(tmpDir, "task-a.md"),
+      `---
+name: task-a
+description: Task A
+schedule: "0 9 * * *"
+cwd: /tmp
+---
+
+Prompt A.
+`
+    );
+
+    writeFileSync(
+      join(tmpDir, "task-b.md"),
+      `---
+name: task-b
+description: Task B
+schedule: "0 10 * * *"
+cwd: /tmp
+---
+
+Prompt B.
+`
+    );
+
+    const { tasks, errors } = readAllTasks(tmpDir);
+    expect(tasks).toHaveLength(2);
+    expect(errors).toHaveLength(0);
+    expect(tasks.map((t) => t.name).sort()).toEqual(["task-a", "task-b"]);
+  });
+
+  it("returns errors for invalid files without crashing", () => {
+    writeFileSync(
+      join(tmpDir, "good.md"),
+      `---
+name: good
+description: Good task
+schedule: "0 9 * * *"
+cwd: /tmp
+---
+
+Good prompt.
+`
+    );
+
+    writeFileSync(join(tmpDir, "bad.md"), "no frontmatter at all");
+
+    const { tasks, errors } = readAllTasks(tmpDir);
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].name).toBe("good");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].file).toBe("bad.md");
+  });
+
+  it("returns empty arrays for nonexistent directory", () => {
+    const { tasks, errors } = readAllTasks("/nonexistent/path");
+    expect(tasks).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+});
+
+describe("setTaskEnabled", () => {
+  it("updates the enabled field in frontmatter", () => {
+    const filePath = join(tmpDir, "toggle.md");
+    writeFileSync(
+      filePath,
+      `---
+name: toggle
+description: Toggle task
+schedule: "0 9 * * *"
+cwd: /tmp
+enabled: true
+---
+
+Prompt.
+`
+    );
+
+    setTaskEnabled(filePath, false);
+    const content = readFileSync(filePath, "utf-8");
+    expect(content).toContain("enabled: false");
+
+    setTaskEnabled(filePath, true);
+    const content2 = readFileSync(filePath, "utf-8");
+    expect(content2).toContain("enabled: true");
+  });
+});
