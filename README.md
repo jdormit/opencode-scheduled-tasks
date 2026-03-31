@@ -1,4 +1,4 @@
-# opencode-scheduled-tasks
+# opencode-scheduler
 
 Scheduled task runner plugin for [OpenCode](https://opencode.ai). Define recurring tasks as markdown files with cron schedules, or let agents schedule one-off tasks via tool calls. A background daemon executes tasks on schedule via `opencode run`.
 
@@ -8,7 +8,7 @@ Scheduled task runner plugin for [OpenCode](https://opencode.ai). Define recurri
 
 ```json
 {
-  "plugin": ["opencode-scheduled-tasks"]
+  "plugin": ["opencode-scheduler"]
 }
 ```
 

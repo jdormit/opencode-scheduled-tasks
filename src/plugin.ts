@@ -394,7 +394,7 @@ Common examples:
             if (overdueTasks.length > 0 && !isInstalled()) {
               await ctx.client.app.log({
                 body: {
-                  service: "opencode-scheduled-tasks",
+                  service: "opencode-scheduler",
                   level: "warn",
                   message: `${overdueTasks.length} overdue task(s) found but scheduler daemon is not installed. Run: npx opencode-scheduler --install`,
                 },
