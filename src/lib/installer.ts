@@ -12,8 +12,8 @@ import { fileURLToPath } from "node:url";
 export type Platform = "macos-launchd" | "linux-systemd" | "unsupported";
 
 const LAUNCHD_LABEL = "ai.opencode.scheduled-tasks";
-const SYSTEMD_SERVICE = "opencode-scheduler.service";
-const SYSTEMD_TIMER = "opencode-scheduler.timer";
+const SYSTEMD_SERVICE = "opencode-tasks.service";
+const SYSTEMD_TIMER = "opencode-tasks.timer";
 
 /**
  * Detect the platform and init system
@@ -37,7 +37,7 @@ export function detectPlatform(): Platform {
  * Since tsup bundles installer.ts into cli.js, import.meta.url
  * already points to the CLI script when running from the bundle.
  * When running from source (ts-node/tsx), we walk up to find dist/cli.js.
- * As a final fallback, we look for the `opencode-scheduler` bin on PATH.
+ * As a final fallback, we look for the `opencode-tasks` bin on PATH.
  */
 function resolveSchedulerPath(): string {
   const thisFile = fileURLToPath(import.meta.url);
@@ -62,7 +62,7 @@ function resolveSchedulerPath(): string {
 
   // Case 3: Fallback to PATH lookup
   try {
-    const result = execFileSync("which", ["opencode-scheduler"], {
+    const result = execFileSync("which", ["opencode-tasks"], {
       encoding: "utf-8",
     }).trim();
     if (result) return resolve(result);
@@ -71,7 +71,7 @@ function resolveSchedulerPath(): string {
   }
 
   throw new Error(
-    "Could not find the opencode-scheduler script. " +
+    "Could not find the opencode-tasks script. " +
       "Make sure the package is properly installed."
   );
 }
@@ -319,7 +319,7 @@ export async function install(): Promise<void> {
         "Unsupported platform. Supported: macOS (launchd), Linux (systemd)."
       );
       console.error("You can still run the scheduler manually:");
-      console.error("  npx opencode-scheduler --run-once");
+      console.error("  npx opencode-tasks --run-once");
       process.exit(1);
   }
 }

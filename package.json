@@ -1,6 +1,6 @@
 {
-  "name": "opencode-scheduler",
-  "version": "0.1.0",
+  "name": "opencode-tasks",
+  "version": "0.1.2",
   "description": "Scheduled task runner plugin for OpenCode - cron-based recurring and one-off task scheduling",
   "type": "module",
   "main": "./dist/plugin.js",
@@ -13,7 +13,7 @@
     }
   },
   "bin": {
-    "opencode-scheduler": "dist/cli.js"
+    "opencode-tasks": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -39,7 +39,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jdormit/opencode-scheduler.git"
+    "url": "git+https://github.com/jdormit/opencode-tasks.git"
   },
   "engines": {
     "node": ">=18.0.0"

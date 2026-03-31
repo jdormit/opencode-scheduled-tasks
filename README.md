@@ -1,4 +1,4 @@
-# opencode-scheduler
+# opencode-tasks
 
 Scheduled task runner plugin for [OpenCode](https://opencode.ai). Define recurring tasks as markdown files with cron schedules, or let agents schedule one-off tasks via tool calls. A background daemon executes tasks on schedule via `opencode run`.
 
@@ -8,7 +8,7 @@ Scheduled task runner plugin for [OpenCode](https://opencode.ai). Define recurri
 
 ```json
 {
-  "plugin": ["opencode-scheduler"]
+  "plugin": ["opencode-tasks"]
 }
 ```
 
@@ -17,7 +17,7 @@ Scheduled task runner plugin for [OpenCode](https://opencode.ai). Define recurri
 The daemon runs every 60 seconds and executes any tasks that are due. It auto-detects your platform (macOS launchd or Linux systemd).
 
 ```bash
-npx opencode-scheduler --install
+npx opencode-tasks --install
 ```
 
 ### 3. Install the agent skill (optional)
@@ -25,7 +25,7 @@ npx opencode-scheduler --install
 This gives the agent context on how to use the scheduling tools, especially around permissions.
 
 ```bash
-npx opencode-scheduler --install-skill
+npx opencode-tasks --install-skill
 ```
 
 ## Quick start
@@ -167,28 +167,28 @@ Ask: "Will this task touch any files outside its `cwd`?" If yes, add `external_d
 
 ## CLI reference
 
-The `opencode-scheduler` CLI manages the scheduler daemon and provides task visibility. All commands are available via `npx`.
+The `opencode-tasks` CLI manages the scheduler daemon and provides task visibility. All commands are available via `npx`.
 
 ```
-npx opencode-scheduler --install        Install the system scheduler (launchd/systemd)
-npx opencode-scheduler --uninstall      Remove the system scheduler
-npx opencode-scheduler --install-skill  Install the scheduled-tasks agent skill
-npx opencode-scheduler --status         Show scheduler and task status
-npx opencode-scheduler --list           List all tasks with next run times
-npx opencode-scheduler --help           Show help
+npx opencode-tasks --install        Install the system scheduler (launchd/systemd)
+npx opencode-tasks --uninstall      Remove the system scheduler
+npx opencode-tasks --install-skill  Install the scheduled-tasks agent skill
+npx opencode-tasks --status         Show scheduler and task status
+npx opencode-tasks --list           List all tasks with next run times
+npx opencode-tasks --help           Show help
 ```
 
 The following commands are used internally by the scheduler daemon and generally don't need to be run manually:
 
 ```
-opencode-scheduler --run-once           Run one scheduler tick
-opencode-scheduler --exec-task <id>     Execute a specific task (used by worker processes)
+opencode-tasks --run-once           Run one scheduler tick
+opencode-tasks --exec-task <id>     Execute a specific task (used by worker processes)
 ```
 
 ### Example output
 
 ```
-$ npx opencode-scheduler --status
+$ npx opencode-tasks --status
 
 Scheduler: installed (macos-launchd)
   Plist: ~/Library/LaunchAgents/ai.opencode.scheduled-tasks.plist
@@ -223,7 +223,7 @@ The plugin has three components:
 
 1. **Plugin** (`dist/plugin.js`) — Loaded by OpenCode's Bun-based plugin runtime. Exposes tools to the agent and reads/writes the SQLite database. Uses `bun:sqlite`.
 
-2. **CLI** (`dist/cli.js`, bin: `opencode-scheduler`) — Standalone Node.js script. Manages the scheduler daemon, runs scheduler ticks, and executes task workers. Uses `better-sqlite3`.
+2. **CLI** (`dist/cli.js`, bin: `opencode-tasks`) — Standalone Node.js script. Manages the scheduler daemon, runs scheduler ticks, and executes task workers. Uses `better-sqlite3`.
 
 3. **Task files** (`~/.config/opencode/tasks/*.md`) — User-editable recurring task definitions with YAML frontmatter.
 
@@ -233,10 +233,10 @@ Both the plugin and CLI read/write the same SQLite database at `~/.config/openco
 
 ```
 launchd/systemd (every 60s)
-  └─ opencode-scheduler --run-once        # scheduler tick
+  └─ opencode-tasks --run-once        # scheduler tick
        ├─ checks which tasks are due
        ├─ spawns worker for each due task  # returns immediately
-       │    └─ opencode-scheduler --exec-task <id>
+       │    └─ opencode-tasks --exec-task <id>
        │         └─ opencode run ...       # full LLM session
        │              └─ updates DB on completion
        └─ reaps any crashed workers
@@ -267,7 +267,7 @@ npm run test:watch
 
 ```
 src/
-  cli.ts              # CLI entry point (opencode-scheduler)
+  cli.ts              # CLI entry point (opencode-tasks)
   plugin.ts           # OpenCode plugin entry point
   lib/
     types.ts          # Shared TypeScript types

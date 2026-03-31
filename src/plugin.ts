@@ -11,7 +11,7 @@ function getDb(): TaskDatabase {
 
 function schedulerWarning(): string {
   if (!isInstalled()) {
-    return "\n\nNote: The opencode-scheduler daemon is not installed. Tasks will only execute when the scheduler is run manually. Install it with: npx opencode-scheduler --install";
+    return "\n\nNote: The opencode-tasks daemon is not installed. Tasks will only execute when the scheduler is run manually. Install it with: npx opencode-tasks --install";
   }
   return "";
 }
@@ -21,7 +21,7 @@ export const ScheduledTasksPlugin: Plugin = async (ctx) => {
     tool: {
       schedule_task: tool({
         description:
-          "Schedule a one-off task to run at a specific time. The task will execute an opencode prompt in the specified working directory. Requires the opencode-scheduler daemon to be installed for reliable execution.",
+          "Schedule a one-off task to run at a specific time. The task will execute an opencode prompt in the specified working directory. Requires the opencode-tasks daemon to be installed for reliable execution.",
         args: {
           prompt: tool.schema.string(
             "The prompt to send to opencode when the task runs"
@@ -376,7 +376,7 @@ Common examples:
 ### Notes
 
 - The scheduler daemon must be installed for tasks to run automatically:
-  \`npx opencode-scheduler --install\`
+  \`npx opencode-tasks --install\`
 - Tasks use your system's local timezone
 - Tasks with \`session_name\` set will reuse the same session across runs
 - Use \`enabled: false\` to temporarily disable a task without deleting it${schedulerWarning()}`;
@@ -394,9 +394,9 @@ Common examples:
             if (overdueTasks.length > 0 && !isInstalled()) {
               await ctx.client.app.log({
                 body: {
-                  service: "opencode-scheduler",
+                  service: "opencode-tasks",
                   level: "warn",
-                  message: `${overdueTasks.length} overdue task(s) found but scheduler daemon is not installed. Run: npx opencode-scheduler --install`,
+                  message: `${overdueTasks.length} overdue task(s) found but scheduler daemon is not installed. Run: npx opencode-tasks --install`,
                 },
               });
             }

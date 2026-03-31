@@ -263,7 +263,7 @@ function showStatus(): void {
     }
   } else {
     console.log(`Scheduler: not installed (detected platform: ${platform})`);
-    console.log("  Run: npx opencode-scheduler --install");
+    console.log("  Run: npx opencode-tasks --install");
   }
 
   console.log("");
@@ -375,19 +375,19 @@ function doInstallSkill(srcPath: string): void {
 }
 
 function printUsage(): void {
-  console.log(`opencode-scheduler - CLI for OpenCode scheduled tasks
+  console.log(`opencode-tasks - CLI for OpenCode scheduled tasks
 
 Usage:
-  opencode-scheduler --run-once     Run one scheduler tick
-  opencode-scheduler --install      Install the system scheduler (launchd/systemd)
-  opencode-scheduler --uninstall    Remove the system scheduler
-  opencode-scheduler --install-skill  Install the scheduled-tasks agent skill
-  opencode-scheduler --status       Show scheduler and task status
-  opencode-scheduler --list         List all tasks with next run times
-  opencode-scheduler --help         Show this help message
+  opencode-tasks --run-once     Run one scheduler tick
+  opencode-tasks --install      Install the system scheduler (launchd/systemd)
+  opencode-tasks --uninstall    Remove the system scheduler
+  opencode-tasks --install-skill  Install the scheduled-tasks agent skill
+  opencode-tasks --status       Show scheduler and task status
+  opencode-tasks --list         List all tasks with next run times
+  opencode-tasks --help         Show this help message
 
 Internal (used by spawned workers):
-  opencode-scheduler --exec-task <runId> [--oneoff]
+  opencode-tasks --exec-task <runId> [--oneoff]
 `);
 }
 
