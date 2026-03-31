@@ -42,8 +42,8 @@ function validateFrontmatter(
     }
   }
 
-  if (!data.description || typeof data.description !== "string") {
-    errors.push("Missing or invalid 'description' field");
+  if (data.description !== undefined && typeof data.description !== "string") {
+    errors.push("Invalid 'description' field (must be a string)");
   }
 
   if (!data.schedule || typeof data.schedule !== "string") {

@@ -57,6 +57,26 @@ Do the thing.
     expect(task.filePath).toBe(filePath);
   });
 
+  it("parses a task file without description", () => {
+    const filePath = join(tmpDir, "no-desc.md");
+    writeFileSync(
+      filePath,
+      `---
+name: no-desc
+schedule: "0 9 * * *"
+cwd: ~/projects
+---
+
+Do the thing.
+`
+    );
+
+    const task = parseTaskFile(filePath);
+    expect(task.name).toBe("no-desc");
+    expect(task.description).toBeUndefined();
+    expect(task.schedule).toBe("0 9 * * *");
+  });
+
   it("parses all optional fields", () => {
     const filePath = join(tmpDir, "full-task.md");
     writeFileSync(

@@ -16,8 +16,8 @@ export type PermissionConfig = Record<string, PermissionRule>;
 export interface RecurringTask {
   /** Unique task identifier (must match filename without .md) */
   name: string;
-  /** Human-readable description */
-  description: string;
+  /** Human-readable description (optional for recurring tasks) */
+  description?: string;
   /** Cron expression (5-field standard cron) */
   schedule: string;
   /** Working directory for task execution. Supports ~ expansion. */
@@ -43,7 +43,7 @@ export interface RecurringTask {
  */
 export interface TaskFrontmatter {
   name: string;
-  description: string;
+  description?: string;
   schedule: string;
   cwd: string;
   session_name?: string;

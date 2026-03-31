@@ -57,7 +57,7 @@ The file has YAML frontmatter followed by the prompt that gets sent to the agent
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | `name` | string | yes | — | Unique identifier. Must match the filename (without `.md`). |
-| `description` | string | yes | — | Human-readable description. |
+| `description` | string | no | — | Human-readable description. |
 | `schedule` | string | yes | — | 5-field cron expression. Uses system local timezone. |
 | `cwd` | string | yes | — | Working directory. Supports `~` expansion. |
 | `session_name` | string | no | — | If set, reuses the same session across runs. If omitted, creates a fresh session each run. |

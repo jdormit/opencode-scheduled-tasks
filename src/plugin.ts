@@ -321,7 +321,7 @@ Each file should be named after the task (e.g., \`daily-cleanup.md\`) and contai
 \`\`\`yaml
 ---
 name: daily-cleanup          # Required. Must match filename (without .md)
-description: Clean up old branches  # Required. Human-readable description
+description: Clean up old branches  # Optional. Human-readable description
 schedule: "0 9 * * *"        # Required. 5-field cron expression
 cwd: ~/projects/my-app       # Required. Working directory (~ is expanded)
 session_name: daily-cleanup   # Optional. Reuses the same session across runs. Omit for fresh session each run.
