@@ -295,6 +295,9 @@ function showStatus(): void {
       let lastStr = "never run";
       if (lastRun) {
         lastStr = `${lastRun.status} ${lastRun.startedAt}`;
+        if (lastRun.sessionId) {
+          lastStr += `  session: ${lastRun.sessionId}`;
+        }
       }
 
       console.log(
@@ -320,6 +323,9 @@ function showStatus(): void {
         );
       }
     }
+
+    console.log("");
+    console.log("To view a task session: opencode -s <session-id>");
   } finally {
     db.close();
   }
