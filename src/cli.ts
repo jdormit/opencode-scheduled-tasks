@@ -218,14 +218,14 @@ function listTasks(): void {
 
         if (task.enabled) {
           try {
-            nextStr = `next: ${getNextRunTime(task.schedule)}`;
+            nextStr = `next: ${localTime(getNextRunTime(task.schedule))}`;
           } catch {
             nextStr = "next: invalid cron";
           }
         }
 
         if (lastRun) {
-          lastStr = `${lastRun.status} ${lastRun.startedAt}`;
+          lastStr = `${lastRun.status} ${localTime(lastRun.startedAt)}`;
         }
 
         console.log(
@@ -243,7 +243,7 @@ function listTasks(): void {
       console.log("");
       for (const task of oneoffs) {
         console.log(
-          `  ${task.id.slice(0, 12)}...  "${task.description}"  scheduled: ${task.scheduledAt}`
+          `  ${task.id.slice(0, 12)}...  "${task.description}"  scheduled: ${localTime(task.scheduledAt)}`
         );
       }
     }
@@ -287,14 +287,14 @@ function showStatus(): void {
 
       let nextStr = "";
       try {
-        nextStr = `next: ${getNextRunTime(task.schedule)}`;
+        nextStr = `next: ${localTime(getNextRunTime(task.schedule))}`;
       } catch {
         nextStr = "next: invalid cron";
       }
 
       let lastStr = "never run";
       if (lastRun) {
-        lastStr = `${lastRun.status} ${lastRun.startedAt}`;
+        lastStr = `${lastRun.status} ${localTime(lastRun.startedAt)}`;
         if (lastRun.sessionId) {
           lastStr += `  session: ${lastRun.sessionId}`;
         }
@@ -319,7 +319,7 @@ function showStatus(): void {
       console.log(`One-off tasks: ${pendingOneoffs.length} pending`);
       for (const task of pendingOneoffs) {
         console.log(
-          `  ${task.id.slice(0, 12)}...  "${task.description}"  scheduled: ${task.scheduledAt}`
+          `  ${task.id.slice(0, 12)}...  "${task.description}"  scheduled: ${localTime(task.scheduledAt)}`
         );
       }
     }
@@ -329,6 +329,21 @@ function showStatus(): void {
   } finally {
     db.close();
   }
+}
+
+/**
+ * Format an ISO timestamp as local time (e.g., "2026-03-30 5:12 PM")
+ */
+function localTime(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function log(message: string, level: "info" | "error" = "info"): void {
