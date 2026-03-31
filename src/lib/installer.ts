@@ -204,6 +204,7 @@ Description=OpenCode Scheduled Tasks Runner
 
 [Service]
 Type=oneshot
+KillMode=process
 ExecStart=${nodePath} ${schedulerPath} --run-once
 Environment=PATH=${currentPath}
 `;
