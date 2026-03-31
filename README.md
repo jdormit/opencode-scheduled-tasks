@@ -181,8 +181,7 @@ npx opencode-scheduler --help           Show help
 The following commands are used internally by the scheduler daemon and generally don't need to be run manually:
 
 ```
-opencode-scheduler                      Run one scheduler tick
-opencode-scheduler --run-once           Run one scheduler tick (explicit)
+opencode-scheduler --run-once           Run one scheduler tick
 opencode-scheduler --exec-task <id>     Execute a specific task (used by worker processes)
 ```
 

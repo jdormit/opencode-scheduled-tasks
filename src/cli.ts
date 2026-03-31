@@ -378,8 +378,7 @@ function printUsage(): void {
   console.log(`opencode-scheduler - CLI for OpenCode scheduled tasks
 
 Usage:
-  opencode-scheduler                Run one scheduler tick (default)
-  opencode-scheduler --run-once     Run one scheduler tick (explicit)
+  opencode-scheduler --run-once     Run one scheduler tick
   opencode-scheduler --install      Install the system scheduler (launchd/systemd)
   opencode-scheduler --uninstall    Remove the system scheduler
   opencode-scheduler --install-skill  Install the scheduled-tasks agent skill
@@ -429,8 +428,10 @@ async function main(): Promise<void> {
       break;
     }
     case "--run-once":
-    case undefined:
       runTick();
+      break;
+    case undefined:
+      printUsage();
       break;
     default:
       console.error(`Unknown command: ${command}`);
