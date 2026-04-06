@@ -263,7 +263,7 @@ function showStatus(): void {
     }
   } else {
     console.log(`Scheduler: not installed (detected platform: ${platform})`);
-    console.log("  Run: npx opencode-tasks --install");
+    console.log("  Run: bunx opencode-tasks --install");
   }
 
   console.log("");

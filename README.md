@@ -17,7 +17,7 @@ Scheduled task runner plugin for [OpenCode](https://opencode.ai). Define recurri
 The daemon runs every 60 seconds and executes any tasks that are due. It auto-detects your platform (macOS launchd or Linux systemd).
 
 ```bash
-npx opencode-tasks --install
+bunx opencode-tasks --install
 ```
 
 ### 3. Install the agent skill (optional)
@@ -25,7 +25,7 @@ npx opencode-tasks --install
 This gives the agent context on how to use the scheduling tools, especially around permissions.
 
 ```bash
-npx opencode-tasks --install-skill
+bunx opencode-tasks --install-skill
 ```
 
 ## Quick start
@@ -167,15 +167,15 @@ Ask: "Will this task touch any files outside its `cwd`?" If yes, add `external_d
 
 ## CLI reference
 
-The `opencode-tasks` CLI manages the scheduler daemon and provides task visibility. All commands are available via `npx`.
+The `opencode-tasks` CLI manages the scheduler daemon and provides task visibility. All commands are available via `bunx`.
 
 ```
-npx opencode-tasks --install        Install the system scheduler (launchd/systemd)
-npx opencode-tasks --uninstall      Remove the system scheduler
-npx opencode-tasks --install-skill  Install the scheduled-tasks agent skill
-npx opencode-tasks --status         Show scheduler and task status
-npx opencode-tasks --list           List all tasks with next run times
-npx opencode-tasks --help           Show help
+bunx opencode-tasks --install        Install the system scheduler (launchd/systemd)
+bunx opencode-tasks --uninstall      Remove the system scheduler
+bunx opencode-tasks --install-skill  Install the scheduled-tasks agent skill
+bunx opencode-tasks --status         Show scheduler and task status
+bunx opencode-tasks --list           List all tasks with next run times
+bunx opencode-tasks --help           Show help
 ```
 
 The following commands are used internally by the scheduler daemon and generally don't need to be run manually:
@@ -188,7 +188,7 @@ opencode-tasks --exec-task <id>     Execute a specific task (used by worker proc
 ### Example output
 
 ```
-$ npx opencode-tasks --status
+$ bunx opencode-tasks --status
 
 Scheduler: installed (macos-launchd)
   Plist: ~/Library/LaunchAgents/ai.opencode.scheduled-tasks.plist
@@ -223,7 +223,7 @@ The plugin has three components:
 
 1. **Plugin** (`dist/plugin.js`) — Loaded by OpenCode's Bun-based plugin runtime. Exposes tools to the agent and reads/writes the SQLite database. Uses `bun:sqlite`.
 
-2. **CLI** (`dist/cli.js`, bin: `opencode-tasks`) — Standalone Node.js script. Manages the scheduler daemon, runs scheduler ticks, and executes task workers. Uses `better-sqlite3`.
+2. **CLI** (`dist/cli.js`, bin: `opencode-tasks`) — Standalone Bun script. Manages the scheduler daemon, runs scheduler ticks, and executes task workers. Uses `bun:sqlite`.
 
 3. **Task files** (`~/.config/opencode/tasks/*.md`) — User-editable recurring task definitions with YAML frontmatter.
 
@@ -246,21 +246,30 @@ The scheduler tick is non-blocking — it spawns detached worker processes and e
 
 Concurrency is managed via PID tracking. If a task is already running (its worker PID is still alive), the scheduler skips it.
 
+## Prerequisites
+
+[Bun](https://bun.sh) is required. Both the plugin and CLI use `bun:sqlite` for database access.
+
+```bash
+# Install Bun (if not already installed)
+curl -fsSL https://bun.sh/install | bash
+```
+
 ## Development
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Build
-npm run build
+bun run build
 
 # Run tests
-npm test
+bun test
 
 # Watch mode
-npm run dev
-npm run test:watch
+bun run dev
+bun test --watch
 ```
 
 ### Project structure
@@ -272,7 +281,7 @@ src/
   lib/
     types.ts          # Shared TypeScript types
     db.ts             # SQLite database (schema, migrations, CRUD)
-    sqlite.ts         # Runtime-agnostic SQLite abstraction (bun:sqlite / better-sqlite3)
+    sqlite.ts         # SQLite abstraction (bun:sqlite)
     tasks.ts          # Task file parser (frontmatter validation)
     cron.ts           # Cron evaluation (isDue, nextRunTime)
     runner.ts         # Task execution (spawn workers, run opencode)

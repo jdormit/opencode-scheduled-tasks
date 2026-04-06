@@ -98,7 +98,7 @@ function getLaunchdPlistPath(): string {
 }
 
 function generateLaunchdPlist(
-  nodePath: string,
+  bunPath: string,
   schedulerPath: string
 ): string {
   const logDir = getLogDir();
@@ -113,7 +113,7 @@ function generateLaunchdPlist(
   <string>${LAUNCHD_LABEL}</string>
   <key>ProgramArguments</key>
   <array>
-    <string>${nodePath}</string>
+    <string>${bunPath}</string>
     <string>${schedulerPath}</string>
     <string>--run-once</string>
   </array>
@@ -135,7 +135,7 @@ function generateLaunchdPlist(
 }
 
 async function installLaunchd(): Promise<void> {
-  const nodePath = process.execPath;
+  const bunPath = process.execPath;
   const schedulerPath = resolveSchedulerPath();
   const plistPath = getLaunchdPlistPath();
 
@@ -150,7 +150,7 @@ async function installLaunchd(): Promise<void> {
   }
 
   // Write plist
-  const plist = generateLaunchdPlist(nodePath, schedulerPath);
+  const plist = generateLaunchdPlist(bunPath, schedulerPath);
   writeFileSync(plistPath, plist);
 
   // Load
@@ -158,7 +158,7 @@ async function installLaunchd(): Promise<void> {
 
   console.log("Scheduler installed (macOS launchd)");
   console.log(`  Plist: ${plistPath}`);
-  console.log(`  Node:  ${nodePath}`);
+  console.log(`  Bun:   ${bunPath}`);
   console.log(`  Script: ${schedulerPath}`);
   console.log(`  Interval: every 60 seconds`);
   console.log(`  Logs: ${getLogDir()}/scheduler.{log,err}`);
@@ -194,7 +194,7 @@ function getSystemdDir(): string {
 }
 
 function generateSystemdService(
-  nodePath: string,
+  bunPath: string,
   schedulerPath: string
 ): string {
   const currentPath = process.env.PATH ?? "/usr/local/bin:/usr/bin:/bin";
@@ -205,7 +205,7 @@ Description=OpenCode Scheduled Tasks Runner
 [Service]
 Type=oneshot
 KillMode=process
-ExecStart=${nodePath} ${schedulerPath} --run-once
+ExecStart=${bunPath} ${schedulerPath} --run-once
 Environment=PATH=${currentPath}
 `;
 }
@@ -225,7 +225,7 @@ WantedBy=timers.target
 }
 
 async function installSystemd(): Promise<void> {
-  const nodePath = process.execPath;
+  const bunPath = process.execPath;
   const schedulerPath = resolveSchedulerPath();
   const systemdDir = getSystemdDir();
 
@@ -244,7 +244,7 @@ async function installSystemd(): Promise<void> {
   }
 
   // Write unit files
-  writeFileSync(servicePath, generateSystemdService(nodePath, schedulerPath));
+  writeFileSync(servicePath, generateSystemdService(bunPath, schedulerPath));
   writeFileSync(timerPath, generateSystemdTimer());
 
   // Reload, enable, start
@@ -255,7 +255,7 @@ async function installSystemd(): Promise<void> {
   console.log("Scheduler installed (Linux systemd)");
   console.log(`  Service: ${servicePath}`);
   console.log(`  Timer:   ${timerPath}`);
-  console.log(`  Node:    ${nodePath}`);
+  console.log(`  Bun:     ${bunPath}`);
   console.log(`  Script:  ${schedulerPath}`);
   console.log(`  Interval: every 60 seconds`);
 }
@@ -320,7 +320,7 @@ export async function install(): Promise<void> {
         "Unsupported platform. Supported: macOS (launchd), Linux (systemd)."
       );
       console.error("You can still run the scheduler manually:");
-      console.error("  npx opencode-tasks --run-once");
+      console.error("  bunx opencode-tasks --run-once");
       process.exit(1);
   }
 }

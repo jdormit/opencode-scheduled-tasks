@@ -11,7 +11,7 @@ function getDb(): TaskDatabase {
 
 function schedulerWarning(): string {
   if (!isInstalled()) {
-    return "\n\nNote: The opencode-tasks daemon is not installed. Tasks will only execute when the scheduler is run manually. Install it with: npx opencode-tasks --install";
+    return "\n\nNote: The opencode-tasks daemon is not installed. Tasks will only execute when the scheduler is run manually. Install it with: bunx opencode-tasks --install";
   }
   return "";
 }
@@ -376,7 +376,7 @@ Common examples:
 ### Notes
 
 - The scheduler daemon must be installed for tasks to run automatically:
-  \`npx opencode-tasks --install\`
+  \`bunx opencode-tasks --install\`
 - Tasks use your system's local timezone
 - Tasks with \`session_name\` set will reuse the same session across runs
 - Use \`enabled: false\` to temporarily disable a task without deleting it${schedulerWarning()}`;
@@ -396,7 +396,7 @@ Common examples:
                 body: {
                   service: "opencode-tasks",
                   level: "warn",
-                  message: `${overdueTasks.length} overdue task(s) found but scheduler daemon is not installed. Run: npx opencode-tasks --install`,
+                  message: `${overdueTasks.length} overdue task(s) found but scheduler daemon is not installed. Run: bunx opencode-tasks --install`,
                 },
               });
             }

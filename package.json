@@ -1,6 +1,6 @@
 {
   "name": "opencode-tasks",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Scheduled task runner plugin for OpenCode - cron-based recurring and one-off task scheduling",
   "type": "module",
   "main": "./dist/plugin.js",
@@ -23,9 +23,9 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "prepublishOnly": "npm run build",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "prepublishOnly": "bun run build",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "keywords": [
     "opencode",
@@ -41,11 +41,7 @@
     "type": "git",
     "url": "git+https://github.com/jdormit/opencode-tasks.git"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "dependencies": {
-    "better-sqlite3": "^11.0.0",
     "cron-parser": "^5.0.0",
     "gray-matter": "^4.0.3"
   },
@@ -60,10 +56,8 @@
   "devDependencies": {
     "@opencode-ai/plugin": "^1.0.0",
     "@opencode-ai/sdk": "^1.0.0",
-    "@types/better-sqlite3": "^7.6.0",
-    "@types/node": "^22.0.0",
+    "@types/bun": "latest",
     "tsup": "^8.0.0",
-    "typescript": "^5.9.0",
-    "vitest": "^3.0.0"
+    "typescript": "^5.9.0"
   }
 }

@@ -107,9 +107,9 @@ Key points:
 
 Tasks only execute when the scheduler daemon is installed. It runs every 60 seconds via launchd (macOS) or systemd (Linux).
 
-Install: `npx opencode-tasks --install`
-Uninstall: `npx opencode-tasks --uninstall`
-Check status: `npx opencode-tasks --status`
+Install: `bunx opencode-tasks --install`
+Uninstall: `bunx opencode-tasks --uninstall`
+Check status: `bunx opencode-tasks --status`
 
 If the daemon is not installed, warn the user and suggest they install it.
 
